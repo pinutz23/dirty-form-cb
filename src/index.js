@@ -1,48 +1,74 @@
-class DirtyFormCb {
-  inputs = [];
+const defaultOptions = {
+  runCbInitially: true
+};
 
-  constructor(form, cb, options) {
+class DirtyFormCb {
+  constructor(form, cb, options = defaultOptions) {
     this.form = form;
     this.cb = cb;
-    this.inputs = [];
+    this.fields = [];
+    this.options = options;
 
     this.isDirtyForm = false;
 
     this._getFormElements();
     this._getInitialValues();
     this._addEventListeners();
+
+    this.options.runCbInitially && this.cb(this.isDirtyForm);
   }
 
   _getFormElements = () => {
-    this.form.querySelectorAll("input").forEach(el => {
-      this.inputs.push({ element: el, initialValue: null, isDirty: false });
-    });
+    this.form
+      .querySelectorAll(
+        `
+        input:not([type='submit']):not([type='reset']):not([type='hidden']),
+        textarea,
+        select
+      `
+      )
+      .forEach(el => {
+        this.fields.push({ element: el, initialValue: null, isDirty: false });
+      });
   };
 
   _getInitialValues = () => {
-    this.inputs.forEach(input => {
-      input.initialValue = input.element.value;
+    this.fields.forEach(field => {
+      field.initialValue = this._getFieldValue(field.element);
     });
   };
 
   _addEventListeners = () => {
-    this.inputs.forEach(input => {
-      input.element.addEventListener("input", e => {
-        this.checkDirtyInput(e, input);
+    this.fields.forEach(field => {
+      field.element.addEventListener("input", e => {
+        this.checkDirtyField(e, field);
         this._checkDirtyForm();
-        this.isDirtyForm && this.cb();
+        this.cb(this.isDirtyForm);
       });
     });
   };
 
-  checkDirtyInput = ({ target: { value } }, input) => {
-    input.isDirty = value !== input.initialValue;
+  checkDirtyField = ({ target }, field) => {
+    field.isDirty = this._getFieldValue(target) !== field.initialValue;
   };
 
   _checkDirtyForm = () => {
-    this.isDirtyForm = this.inputs.filter(input => input.isDirty).length > 0;
+    this.isDirtyForm = this.fields.filter(field => field.isDirty).length > 0;
+  };
+
+  _getFieldValue = field => {
+    switch (field.type) {
+      case "radio":
+      case "checkbox":
+        return field.checked;
+      default:
+        return field.value;
+    }
   };
 }
 
 const form = document.querySelector("form");
-const dirtyForm = new DirtyFormCb(form, () => console.log("DIRTY!!"));
+const dirtyForm = new DirtyFormCb(form, dirty => {
+  console.log(dirty);
+  document.querySelector("input[type='submit']").disabled = !dirty;
+});
