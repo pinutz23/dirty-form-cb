@@ -1,0 +1,29 @@
+{
+  "name": "dirty-form-cb",
+  "version": "0.0.1",
+  "description": "Easily run a callback on a changing form receiving information if the form is dirty.",
+  "main": "src/index.js",
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pinutz23/dirty-form-cb.git"
+  },
+  "author": "Jannik Wempe <jannikwempe@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pinutz23/dirty-form-cb/issues"
+  },
+  "homepage": "https://github.com/pinutz23/dirty-form-cb#readme",
+  "keywords": [
+    "form",
+    "dirty",
+    "dirty form",
+    "callback",
+    "lightweight"
+  ]
+}
